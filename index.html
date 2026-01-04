@@ -54,12 +54,6 @@ body {
 .click-area:active {
     transform: scale(0.96);
 }
-
-.footer {
-    text-align: center;
-    opacity: .4;
-    font-size: 12px;
-}
 </style>
 </head>
 
@@ -69,31 +63,46 @@ body {
 
 <div class="card">
     <div class="card-title">💳 Баланс</div>
-    <div class="balance" id="balance">0 💰</div>
+    <div class="balance" id="balance">Загрузка...</div>
 </div>
 
-<div class="click-area" onclick="fakeClick()">
+<div class="click-area" onclick="clickMoney()">
     🖱 Нажать
 </div>
-
-<div class="footer">Powered by Telegram</div>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-/*
- ВРЕМЕННО:
- делаем локальный клик,
- чтобы UI был ЖИВОЙ
-*/
-let balance = 0;
+const user = tg.initDataUnsafe.user;
+const USER_ID = user.id;
 
-function fakeClick() {
-    balance++;
+// 🔥 ВСТАВЬ СЮДА Cloudflare URL
+const API = "https://downloadable-finish-burke-treasures.trycloudflare.com";
+
+async function getBalance() {
+    const r = await fetch(API + "/balance", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ user_id: USER_ID })
+    });
+    const d = await r.json();
     document.getElementById("balance").innerText =
-        balance + " 💰";
+        d.balance + " 💰";
 }
+
+async function clickMoney() {
+    const r = await fetch(API + "/click", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ user_id: USER_ID })
+    });
+    const d = await r.json();
+    document.getElementById("balance").innerText =
+        d.balance + " 💰";
+}
+
+getBalance();
 </script>
 
 </body>
