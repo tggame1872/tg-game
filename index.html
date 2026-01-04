@@ -2,30 +2,45 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Game</title>
+<title>Telegram Game</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 body {
+    margin: 0;
     background: #020617;
     color: white;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
 }
+
 .card {
-    background: linear-gradient(135deg, #22c55e, #15803d);
-    border-radius: 20px;
+    margin: 20px;
     padding: 20px;
-    margin: 20px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #22c55e, #15803d);
 }
+
+.title {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
 .balance {
-    font-size: 32px;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 10px;
 }
+
 button {
-    width: 90%;
+    width: calc(100% - 40px);
     margin: 20px;
-    padding: 15px;
-    font-size: 18px;
-    border-radius: 15px;
+    padding: 18px;
+    font-size: 20px;
+    border-radius: 16px;
+    border: none;
+    background: #2563eb;
+    color: white;
 }
 </style>
 </head>
@@ -33,34 +48,47 @@ button {
 <body>
 
 <div class="card">
-    <div>💳 Игровая карта</div>
-    <div class="balance" id="balance">0 💰</div>
+    <div class="title">💳 Игровая карта</div>
+    <div class="balance" id="balance">Загрузка...</div>
 </div>
 
-<button onclick="clickMoney()">🖱 Клик</button>
+<button onclick="sendClick()">🖱 Клик</button>
 
 <script>
-let tg = window.Telegram.WebApp;
+const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Данные пользователя от Telegram
-let user = tg.initDataUnsafe.user;
+// Данные пользователя
+const user = tg.initDataUnsafe.user;
+const userId = user.id;
 
-if (!user) {
-    document.body.innerHTML = "Ошибка авторизации";
+// Текущий баланс (ТОЛЬКО отображение)
+let currentBalance = 0;
+
+// Отправка клика на сервер (боту)
+function sendClick() {
+    tg.sendData(JSON.stringify({
+        action: "click"
+    }));
 }
 
-// Telegram ID
-let userId = user.id;
-let username = user.username || "без ника";
+// Приём ответа от бота
+tg.onEvent("message", function (msg) {
+    try {
+        const data = JSON.parse(msg.text);
+        if (data.balance !== undefined) {
+            currentBalance = data.balance;
+            document.getElementById("balance").innerText =
+                currentBalance + " 💰";
+        }
+    } catch (e) {
+        // игнорируем не наши сообщения
+    }
+});
 
-console.log("USER ID:", userId);
-console.log("USERNAME:", username);
-
-let balance = 0;
-
-function clickMoney() {
-    balance++;
-    document.getElementById("balance").innerText = balance + " 💰";
-}
+// Начальное состояние
+document.getElementById("balance").innerText = "0 💰";
 </script>
+
+</body>
+</html>
