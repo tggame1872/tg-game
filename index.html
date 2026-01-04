@@ -43,6 +43,20 @@ button {
 let tg = window.Telegram.WebApp;
 tg.expand();
 
+// Данные пользователя от Telegram
+let user = tg.initDataUnsafe.user;
+
+if (!user) {
+    document.body.innerHTML = "Ошибка авторизации";
+}
+
+// Telegram ID
+let userId = user.id;
+let username = user.username || "без ника";
+
+console.log("USER ID:", userId);
+console.log("USERNAME:", username);
+
 let balance = 0;
 
 function clickMoney() {
@@ -50,6 +64,3 @@ function clickMoney() {
     document.getElementById("balance").innerText = balance + " 💰";
 }
 </script>
-
-</body>
-</html>
