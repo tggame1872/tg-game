@@ -2,83 +2,98 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Telegram Game</title>
-
+<title>DewaNotn</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 body {
     margin: 0;
-    background: #020617;
+    background: radial-gradient(circle at top, #020617, #000);
+    font-family: -apple-system, BlinkMacSystemFont, Arial;
     color: white;
-    font-family: Arial, sans-serif;
+}
+
+.header {
+    padding: 20px;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .card {
-    margin: 20px;
-    padding: 20px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #22c55e, #15803d);
+    margin: 16px;
+    padding: 24px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 10px 40px rgba(34,197,94,.4);
+}
+
+.card-title {
+    font-size: 14px;
+    opacity: .8;
 }
 
 .balance {
-    font-size: 36px;
-    margin-top: 10px;
+    margin-top: 12px;
+    font-size: 40px;
+    font-weight: 700;
 }
 
-button {
-    width: calc(100% - 40px);
-    margin: 20px;
-    padding: 18px;
-    font-size: 20px;
-    border-radius: 16px;
-    border: none;
+.click-area {
+    margin: 40px 16px;
+    padding: 26px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(37,99,235,.4);
+    user-select: none;
+    transition: transform .08s ease;
+}
+
+.click-area:active {
+    transform: scale(0.96);
+}
+
+.footer {
+    text-align: center;
+    opacity: .4;
+    font-size: 12px;
 }
 </style>
 </head>
 
 <body>
 
+<div class="header">DewaNotn</div>
+
 <div class="card">
-    💳 Баланс
-    <div class="balance" id="balance">Загрузка...</div>
+    <div class="card-title">💳 Баланс</div>
+    <div class="balance" id="balance">0 💰</div>
 </div>
 
-<button onclick="clickMoney()">🖱 Клик</button>
+<div class="click-area" onclick="fakeClick()">
+    🖱 Нажать
+</div>
+
+<div class="footer">Powered by Telegram</div>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe.user;
-const USER_ID = user.id;
+/*
+ ВРЕМЕННО:
+ делаем локальный клик,
+ чтобы UI был ЖИВОЙ
+*/
+let balance = 0;
 
-// ⚠️ ВРЕМЕННО: адрес сервера
-const API = "http://ТВОЙ_IP:8000";
-
-async function getBalance() {
-    const res = await fetch(API + "/balance", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({user_id: USER_ID})
-    });
-    const data = await res.json();
+function fakeClick() {
+    balance++;
     document.getElementById("balance").innerText =
-        data.balance + " 💰";
+        balance + " 💰";
 }
-
-async function clickMoney() {
-    const res = await fetch(API + "/click", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({user_id: USER_ID})
-    });
-    const data = await res.json();
-    document.getElementById("balance").innerText =
-        data.balance + " 💰";
-}
-
-getBalance();
 </script>
 
 </body>
