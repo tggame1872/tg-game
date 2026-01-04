@@ -21,14 +21,8 @@ body {
     background: linear-gradient(135deg, #22c55e, #15803d);
 }
 
-.title {
-    font-size: 14px;
-    opacity: 0.8;
-}
-
 .balance {
     font-size: 36px;
-    font-weight: bold;
     margin-top: 10px;
 }
 
@@ -39,8 +33,6 @@ button {
     font-size: 20px;
     border-radius: 16px;
     border: none;
-    background: #2563eb;
-    color: white;
 }
 </style>
 </head>
@@ -48,46 +40,45 @@ button {
 <body>
 
 <div class="card">
-    <div class="title">💳 Игровая карта</div>
+    💳 Баланс
     <div class="balance" id="balance">Загрузка...</div>
 </div>
 
-<button onclick="sendClick()">🖱 Клик</button>
+<button onclick="clickMoney()">🖱 Клик</button>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Данные пользователя
 const user = tg.initDataUnsafe.user;
-const userId = user.id;
+const USER_ID = user.id;
 
-// Текущий баланс (ТОЛЬКО отображение)
-let currentBalance = 0;
+// ⚠️ ВРЕМЕННО: адрес сервера
+const API = "http://ТВОЙ_IP:8000";
 
-// Отправка клика на сервер (боту)
-function sendClick() {
-    tg.sendData(JSON.stringify({
-        action: "click"
-    }));
+async function getBalance() {
+    const res = await fetch(API + "/balance", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({user_id: USER_ID})
+    });
+    const data = await res.json();
+    document.getElementById("balance").innerText =
+        data.balance + " 💰";
 }
 
-// Приём ответа от бота
-tg.onEvent("message", function (msg) {
-    try {
-        const data = JSON.parse(msg.text);
-        if (data.balance !== undefined) {
-            currentBalance = data.balance;
-            document.getElementById("balance").innerText =
-                currentBalance + " 💰";
-        }
-    } catch (e) {
-        // игнорируем не наши сообщения
-    }
-});
+async function clickMoney() {
+    const res = await fetch(API + "/click", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({user_id: USER_ID})
+    });
+    const data = await res.json();
+    document.getElementById("balance").innerText =
+        data.balance + " 💰";
+}
 
-// Начальное состояние
-document.getElementById("balance").innerText = "0 💰";
+getBalance();
 </script>
 
 </body>
