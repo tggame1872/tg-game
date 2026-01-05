@@ -2,98 +2,105 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>NeoApp</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>NeoCard v3</title>
+
+<!-- TELEGRAM -->
+<script src="https://telegram.org/js/telegram-web-app.js?v=3"></script>
+
+<!-- VERSIONING -->
+<meta name="version" content="3">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
 
 <style>
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-    margin: 0;
-    background: linear-gradient(180deg,#020617,#000);
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
-    color: #fff;
+/* ================= RESET ================= */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+    background:linear-gradient(180deg,#020617,#000);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
+    color:#fff;
+    min-height:100vh;
 }
 
-/* ===== ANIMATIONS ===== */
-.fade { animation: fade .35s ease; }
-@keyframes fade { from {opacity:0;transform:translateY(10px)} to {opacity:1} }
+/* ================= ANIMATIONS ================= */
+.fade{animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1}}
 
-/* ===== HEADER ===== */
-.header {
-    padding: 22px 20px 12px;
-    font-size: 26px;
-    font-weight: 800;
+/* ================= HEADER ================= */
+.header{
+    padding:22px 20px 10px;
+    font-size:26px;
+    font-weight:800;
 }
 
-/* ===== CARD ===== */
-.card {
-    margin: 16px;
-    padding: 24px;
-    border-radius: 26px;
+/* ================= CARD ================= */
+.card{
+    margin:16px;
+    padding:26px;
+    border-radius:28px;
     background:
-        radial-gradient(circle at top left,rgba(255,255,255,.18),transparent 40%),
+        radial-gradient(circle at top left,rgba(255,255,255,.25),transparent 45%),
         linear-gradient(135deg,#22c55e,#15803d);
     box-shadow:0 20px 60px rgba(34,197,94,.45);
 }
+.card-label{font-size:13px;opacity:.85}
+.card-balance{margin-top:16px;font-size:42px;font-weight:800}
 
-.card-label { font-size:13px;opacity:.85 }
-.card-balance { margin-top:14px;font-size:42px;font-weight:800 }
-
-/* ===== BLOCK ===== */
-.block {
-    margin: 16px;
-    padding: 18px;
-    border-radius: 22px;
-    background: rgba(255,255,255,.06);
-    backdrop-filter: blur(12px);
+/* ================= BLOCK ================= */
+.block{
+    margin:16px;
+    padding:18px;
+    border-radius:22px;
+    background:rgba(255,255,255,.06);
+    backdrop-filter:blur(14px);
 }
 
-/* ===== ROW ===== */
-.row {
+/* ================= ROW ================= */
+.row{
     display:flex;
     justify-content:space-between;
     padding:14px 0;
     border-bottom:1px solid rgba(255,255,255,.08);
     font-size:15px;
 }
-.row:last-child { border-bottom:none }
+.row:last-child{border-bottom:none}
 
-/* ===== BUTTON ===== */
-.btn {
-    margin: 16px;
-    padding: 22px;
-    border-radius: 22px;
-    background: linear-gradient(135deg,#2563eb,#1e40af);
+/* ================= BUTTON ================= */
+.btn{
+    margin:16px;
+    padding:22px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#2563eb,#1e40af);
     text-align:center;
     font-size:20px;
     font-weight:700;
     box-shadow:0 14px 40px rgba(37,99,235,.5);
-    transition:.1s;
+    transition:.12s;
 }
-.btn:active { transform:scale(.96) }
+.btn:active{transform:scale(.96)}
 
-/* ===== TAB BAR ===== */
-.tabs {
+/* ================= TABS ================= */
+.tabs{
     position:fixed;
-    bottom:0; left:0; right:0;
+    bottom:0;left:0;right:0;
     display:flex;
     background:rgba(0,0,0,.7);
     backdrop-filter:blur(20px);
     border-top:1px solid rgba(255,255,255,.08);
 }
-.tab {
+.tab{
     flex:1;
     padding:14px 0 18px;
     text-align:center;
     font-size:12px;
-    opacity:.5;
+    opacity:.45;
 }
-.tab.active { opacity:1 }
+.tab.active{opacity:1}
 
-/* ===== PAGE ===== */
-.page { display:none; padding-bottom:90px }
-.page.active { display:block }
+/* ================= PAGES ================= */
+.page{display:none;padding-bottom:92px}
+.page.active{display:block}
 </style>
 </head>
 
@@ -105,9 +112,9 @@ body {
 <div class="page active fade" id="home">
     <div class="card">
         <div class="card-label">💳 Баланс</div>
-        <div class="card-balance" id="balance">—</div>
+        <div class="card-balance" id="balance">0 ₽</div>
     </div>
-    <div class="btn" onclick="fakeAdd()">💰 Получить</div>
+    <div class="btn" onclick="add()">💰 Получить</div>
 </div>
 
 <!-- TASKS -->
@@ -149,12 +156,14 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe.user;
-document.getElementById("uid").innerText = user.id;
-
 let balance = 0;
+const user = tg.initDataUnsafe?.user;
 
-function fakeAdd(){
+if(user){
+    document.getElementById("uid").innerText = user.id;
+}
+
+function add(){
     balance++;
     document.getElementById("balance").innerText = balance + " ₽";
 }
@@ -162,6 +171,7 @@ function fakeAdd(){
 function openTab(id,title){
     document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
     document.getElementById(id).classList.add("active");
+
     document.getElementById("title").innerText = title;
 
     document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
@@ -169,5 +179,6 @@ function openTab(id,title){
 }
 </script>
 
+<!-- VERSION MARKER v3 -->
 </body>
 </html>
